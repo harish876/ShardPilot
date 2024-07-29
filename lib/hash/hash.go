@@ -16,7 +16,7 @@ func CalculateShardId(key []byte, numberOfShards int) (uint32, error) {
 	}
 	output := hasher.Sum32()
 	shardId := output % uint32(numberOfShards)
-	return shardId, nil
+	return shardId + 1, nil
 }
 
 func IntToBytes(n int) []byte {

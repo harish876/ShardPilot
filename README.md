@@ -9,4 +9,9 @@
 
 3. Current HTTP layer implementation uses REST. Plan to convert to GRPC/Cap n Proto
 
-4. Topology management for Physical query planner, Docker Compose to set up database shard (**TODOS**) 
+
+**TODOS**
+
+1. Topology management for Physical query planner, Docker Compose to set up database shard (**TODOS**)
+2. Docker Compose Seeder Script doesnt connect properly. Running it separately for now
+3. Create Connection pool to seed large number of values
