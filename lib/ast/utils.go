@@ -1,4 +1,4 @@
-package queryparser
+package ast
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 )
 
 type QueryExecutionParams struct {
-	cursor     *sitter.QueryCursor
-	query      *sitter.Query
-	node       *sitter.Node
+	Cursor     *sitter.QueryCursor
+	Query      *sitter.Query
+	Node       *sitter.Node
 	sourceCode []byte
 }
 
@@ -20,9 +20,9 @@ func NewQueryExecutionParams(
 	sourceCode []byte,
 ) *QueryExecutionParams {
 	return &QueryExecutionParams{
-		cursor:     cursor,
-		query:      query,
-		node:       node,
+		Cursor:     cursor,
+		Query:      query,
+		Node:       node,
 		sourceCode: sourceCode,
 	}
 }
@@ -43,14 +43,14 @@ func NewQueryCursor(
 	return NewQueryExecutionParams(queryCursor, sitterQuery, node, sourceCode), nil
 }
 
-func (qc *QueryExecutionParams) exec() {
-	qc.cursor.Exec(qc.query, qc.node)
+func (qc *QueryExecutionParams) Exec() {
+	qc.Cursor.Exec(qc.Query, qc.Node)
 }
 
-func (qc *QueryExecutionParams) nextMatch() (*sitter.QueryMatch, bool) {
-	return qc.cursor.NextMatch()
+func (qc *QueryExecutionParams) NextMatch() (*sitter.QueryMatch, bool) {
+	return qc.Cursor.NextMatch()
 }
 
-func (qc *QueryExecutionParams) getCaptures(m *sitter.QueryMatch) *sitter.QueryMatch {
-	return qc.cursor.FilterPredicates(m, qc.sourceCode)
+func (qc *QueryExecutionParams) GetCaptures(m *sitter.QueryMatch) *sitter.QueryMatch {
+	return qc.Cursor.FilterPredicates(m, qc.sourceCode)
 }
