@@ -49,3 +49,17 @@ func GetAllColumns(node *pg_query.Node, acc map[string]int32) {
 		slog.Debug("GetAllColumns", "not recognised", node.String())
 	}
 }
+
+func GetQueryType(node *pg_query.Node) (string, error) {
+	if node != nil {
+		return "SELECT", nil
+	} else if node.GetInsertStmt() != nil {
+		return "INSERT", nil
+	} else if node.GetUpdateStmt() != nil {
+		return "UPDATE", nil
+	} else if node.GetDeleteStmt() != nil {
+		return "DELETE", nil
+	} else {
+		return "", fmt.Errorf("unknown query type %v", node)
+	}
+}

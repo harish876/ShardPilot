@@ -1,38 +1,37 @@
 package logicalplanner
 
 import (
-	"context"
-	"fmt"
 	"testing"
 
-	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/sql"
+	pg_query "github.com/pganalyze/pg_query_go/v5"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPrintAst(t *testing.T) {
-	input := []byte(`select * from users where shardId=1 and userId=2 or age < 25`)
-	lp := NewLogicalPlanParams(input)
-	ast, err := lp.PrintAst()
-	assert.NoError(t, err)
-	fmt.Println(ast)
-}
-
 func TestGetShardID1(t *testing.T) {
-	input := []byte(`select * from users where shardId = 83310`)
-	lp := NewLogicalPlanParams(input)
+	input := `select * from users where shardId =1`
+	root, err := pg_query.Parse(input)
+	if err != nil {
+		t.Fatal("error building AST", err)
+	}
+	node := root.Stmts[0].Stmt
+	lp := NewLogicalPlanParams(node)
 	lp.
 		GetQueryType().
 		GetShardID()
 
 	assert.NoError(t, lp.err, "Error creating query plan")
-	assert.Equal(t, lp.shardId, uint32(83310))
+	assert.Equal(t, lp.shardId, uint32(1))
 	assert.Equal(t, lp.queryType, "SELECT")
 }
 
 func TestGetShardID2(t *testing.T) {
-	input := []byte(`select * from users where shardId = 83310 and userId = 123`)
-	lp := NewLogicalPlanParams(input)
+	input := `select * from users where shardId = 83310 and userId = 123`
+	root, err := pg_query.Parse(input)
+	if err != nil {
+		t.Fatal("error building AST", err)
+	}
+	node := root.Stmts[0].Stmt
+	lp := NewLogicalPlanParams(node)
 	lp.
 		GetQueryType().
 		GetShardID()
@@ -43,8 +42,14 @@ func TestGetShardID2(t *testing.T) {
 }
 
 func TestGetShardID3(t *testing.T) {
-	input := []byte(`select * from users`)
-	lp := NewLogicalPlanParams(input)
+	input := `select * from users`
+	root, err := pg_query.Parse(input)
+	if err != nil {
+		t.Fatal("error building AST", err)
+	}
+
+	node := root.Stmts[0].Stmt
+	lp := NewLogicalPlanParams(node)
 	lp.
 		GetQueryType().
 		GetShardID()
@@ -54,8 +59,13 @@ func TestGetShardID3(t *testing.T) {
 }
 
 func TestGetShardID4(t *testing.T) {
-	input := []byte(`select * from users where shardId=1 and (userId=3 or colX = Z)`)
-	lp := NewLogicalPlanParams(input)
+	input := `select * from users where shardId=1 and (userId=3 or colX = Z)`
+	root, err := pg_query.Parse(input)
+	if err != nil {
+		t.Fatal("error building AST", err)
+	}
+	node := root.Stmts[0].Stmt
+	lp := NewLogicalPlanParams(node)
 	lp.
 		GetQueryType().
 		GetShardID()
@@ -65,15 +75,13 @@ func TestGetShardID4(t *testing.T) {
 }
 
 func TestGetQueryType(t *testing.T) {
-	input := []byte(`INSERT INTO users (userId,name) (123,"harish")`)
-	lp := NewLogicalPlanParams(input)
+	input := `INSERT INTO employees (id, name, position) VALUES (1, 'John Doe', 'Software Engineer');`
+	root, err := pg_query.Parse(input)
+	if err != nil {
+		t.Fatal("error building AST", err)
+	}
+	node := root.Stmts[0].Stmt
+	lp := NewLogicalPlanParams(node)
 	lp.GetQueryType()
 	assert.NoError(t, lp.err, "Error getting query type from query%v", lp.err)
-}
-
-func TestWalk(t *testing.T) {
-	input := []byte(`select * from users where shardId = 83310 and userId = 123`)
-	node, _ := sitter.ParseCtx(context.Background(), input, sql.GetLanguage())
-	Walk(node, input, 0)
-	fmt.Println(node.String())
 }
