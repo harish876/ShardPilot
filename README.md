@@ -1,39 +1,88 @@
-## Shard Pilot
+# ShardPilot
 
-1. Implemented a simple query engine to route database queries to individual shards based on the article (https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)
-2. A simple proof of concept solution was done for select statements of Shard ID and other columns to be queried.   
+## Overview
 
+**ShardPilot** is a query engine designed to route database queries to individual shards based on the approach detailed in [Figma's Database Scaling Blog](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/). This project provides a proof of concept for handling `SELECT` statements with Shard IDs and other query parameters.
 
-# Setup
-1. Clone the repository ```git clone https://github.com/harish876/ShardPilot```
-2. Install Deps ```go mod tidy```
-3. Navigate to the db/seed folder and run the docker-compose file to set up the database and run the seeder scripts like so ``` cd db/seed && docker-compose up --build && go run seeder. go```
-4. Run ``` go run cmd/main.go``` from the root directory to start the server.
-5. Hit the endpoint with a query that contains Shard ID and other columns queried
-   Request:
+## Features
+
+- **Query Routing**: Routes queries to the correct shard based on Shard ID.
+- **Query Transformation**: Converts SQL queries into an Abstract Syntax Tree (AST) and rewrites them to exclude Shard IDs.
+- **Database Interaction**: Executes transformed queries on the appropriate shard and returns results.
+
+## Setup
+
+Follow these steps to get ShardPilot up and running:
+
+1. **Clone the Repository**:
+
+    ```bash
+    git clone https://github.com/harish876/ShardPilot
     ```
-       {
-        "query":"select * from users where shardId=3 and name = 'Hannah Harris'"
-       }
-     ```
-   Response: The query engine converts the query to an AST, gets the Shard ID, gets the correct connection string for that shard rewrites the query without the Shard ID, and gets the rows from the table.
-     ```
-        {
-       "message": "Query on ShardID 3. Query Executed on the DB: SELECT * FROM users WHERE name = 'Hannah Harris'",
-       "data": [
-        {
-            "UserID": 34,
-            "Name": "Hannah Harris",
-            "PhoneNumber": "+71-5781028656",
-            "Email": "hannah_harris@example.com"
-        }
-       ],
-       "error": ""
-        }
-     ```
 
-**TODOS**
-1. Topology management and the distinction between logical shards and physical shards.
-2. Improving / Learning more about the Figma implementation in detail.
-3. Converting REST Endpoints to GRPC because why not?
-4. Physical Planner with proper configuration management from a static file.
+2. **Install Dependencies**:
+
+    Navigate to the project root and run:
+
+    ```bash
+    go mod tidy
+    ```
+
+3. **Setup the Database**:
+
+    - Navigate to the `db/seed` folder:
+
+      ```bash
+      cd db/seed
+      ```
+
+    - Build and start the Docker containers, then run the seeder script:
+
+      ```bash
+      docker-compose up --build
+      go run seeder.go
+      ```
+
+4. **Start the Server**:
+
+    From the root directory, run:
+
+    ```bash
+    go run cmd/main.go
+    ```
+
+5. **Query the Endpoint**:
+
+    Send a request to the endpoint with a query containing Shard ID and other columns. For example:
+
+    **Request:**
+
+    ```json
+    {
+      "query": "SELECT * FROM users WHERE shardId=3 AND name = 'Hannah Harris'"
+    }
+    ```
+
+    **Response:**
+
+    ```json
+    {
+      "message": "Query on ShardID 3. Query Executed on the DB: SELECT * FROM users WHERE name = 'Hannah Harris'",
+      "data": [
+        {
+          "UserID": 34,
+          "Name": "Hannah Harris",
+          "PhoneNumber": "+71-5781028656",
+          "Email": "hannah_harris@example.com"
+        }
+      ],
+      "error": ""
+    }
+    ```
+
+## TODOs
+
+1. **Topology Management**: Implement and distinguish between logical shards and physical shards.
+2. **Figma Implementation**: Deepen understanding and integration of Figma's approach.
+3. **gRPC Conversion**: Convert REST endpoints to gRPC for enhanced performance and scalability.
+4. **Physical Planner**: Develop a physical planner with configuration management from a static file.
