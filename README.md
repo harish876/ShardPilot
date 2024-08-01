@@ -1,6 +1,6 @@
 ## Shard Pilot
 
-1. Implemented a simple query engine to route database queries to individual shards based on the article [https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/]
+1. Implemented a simple query engine to route database queries to individual shards based on the article (https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)
 2. A simple proof of concept solution was done for select statements of Shard ID and other columns to be queried.   
 
 
@@ -11,25 +11,25 @@
 4. Run ``` go run cmd/main.go``` from the root directory to start the server.
 5. Hit the endpoint with a query that contains Shard ID and other columns queried
    Request:
-       ```
+    ```
        {
         "query":"select * from users where shardId=3 and name = 'Hannah Harris'"
        }
-       ```
+     ```
    Response: The query engine converts the query to an AST, gets the Shard ID, gets the correct connection string for that shard rewrites the query without the Shard ID, and gets the rows from the table.
      ```
-     {
-    "message": "Query on ShardID 3. Query Executed on the DB: SELECT * FROM users WHERE name = 'Hannah Harris'",
-    "data": [
+        {
+       "message": "Query on ShardID 3. Query Executed on the DB: SELECT * FROM users WHERE name = 'Hannah Harris'",
+       "data": [
         {
             "UserID": 34,
             "Name": "Hannah Harris",
             "PhoneNumber": "+71-5781028656",
             "Email": "hannah_harris@example.com"
         }
-    ],
-    "error": ""
-     }
+       ],
+       "error": ""
+        }
      ```
 
 **TODOS**
