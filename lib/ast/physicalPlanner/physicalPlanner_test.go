@@ -35,7 +35,9 @@ func TestQuerier(t *testing.T) {
 func TestPgQuery1(t *testing.T) {
 	setup()
 	query := "SELECT * from users where shardId=1"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
@@ -45,7 +47,9 @@ func TestPgQuery1(t *testing.T) {
 func TestPgQuery2(t *testing.T) {
 	setup()
 	query := "SELECT * from users where shardId=1 and (userId=3 or age < 25)"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
@@ -55,7 +59,10 @@ func TestPgQuery2(t *testing.T) {
 func TestPgQuery3(t *testing.T) {
 	setup()
 	query := "SELECT * from users where (userId=3 or age < 25) and shardId=1"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
+
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
@@ -65,7 +72,10 @@ func TestPgQuery3(t *testing.T) {
 func TestPgQuery4(t *testing.T) {
 	setup()
 	query := "SELECT * from users where userId=3 or age < 25 and shardId=1"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
+
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
@@ -75,7 +85,10 @@ func TestPgQuery4(t *testing.T) {
 func TestPgQuery5(t *testing.T) {
 	setup()
 	query := "SELECT * FROM users WHERE shardId = 1 AND age BETWEEN 25 AND 35"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
+
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
@@ -85,7 +98,10 @@ func TestPgQuery5(t *testing.T) {
 func TestPgQuery6(t *testing.T) {
 	setup()
 	query := "SELECT * FROM users WHERE shardId = 1 AND name LIKE 'John%'"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
+
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
@@ -95,7 +111,10 @@ func TestPgQuery6(t *testing.T) {
 func TestPgQuery7(t *testing.T) {
 	setup()
 	query := "SELECT * FROM users WHERE shardId = 1 AND age IN (25, 30, 35)"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
+
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
@@ -105,9 +124,29 @@ func TestPgQuery7(t *testing.T) {
 func TestPgQuery8(t *testing.T) {
 	setup()
 	query := "SELECT * FROM users WHERE shardId = 1 AND email IS NOT NULL;"
-	modifiedQuery, err := RewriteSelectQuery(query)
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
+
 	if err != nil {
 		t.Fatalf("Error - %v", err)
 	}
 	assert.Equal(t, "SELECT * FROM users WHERE email IS NOT NULL", modifiedQuery)
+}
+
+func TestPgQuery9(t *testing.T) {
+	setup()
+	query := "SELECT * FROM users INNER JOIN favourites on users.id = favourites.user_id where shardId =1 "
+	node, err := pg_query.Parse(query)
+	assert.NoError(t, err)
+	modifiedQuery, err := RewriteSelectQuery(node)
+
+	if err != nil {
+		t.Fatalf("Error - %v", err)
+	}
+	assert.Equal(
+		t,
+		"SELECT * FROM users JOIN favourites ON users.id = favourites.user_id",
+		modifiedQuery,
+	)
 }

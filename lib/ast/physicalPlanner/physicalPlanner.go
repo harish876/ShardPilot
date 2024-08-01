@@ -10,21 +10,15 @@ import (
 )
 
 // TODO: improve code structure
-func RewriteSelectQuery(query string) (string, error) {
-	result, err := pg_query.Parse(query)
-	if err != nil {
-		panic(err)
+func RewriteSelectQuery(node *pg_query.ParseResult, colNameToRemove string) (string, error) {
+	if len(node.Stmts) == 0 {
+		return "", fmt.Errorf("no statements in the query - %s", node.String())
 	}
 
-	if len(result.Stmts) == 0 {
-		return "", fmt.Errorf("no statements in the query - %s", query)
-	}
-
-	root := result.Stmts[0]
+	root := node.Stmts[0]
 	whereClause := root.Stmt.GetSelectStmt().WhereClause
 
 	if ast.IsBoolExpr(whereClause) {
-		slog.Debug("Rewrite Query", "Query", query)
 		slog.Debug("RewriteQuery", "Original Where Clause", whereClause.String())
 		modifiedWhereClause := removeShardId(whereClause, "shardid")
 		slog.Debug("Rewrite Query", "Modified Where Clause", modifiedWhereClause.String())
@@ -35,15 +29,15 @@ func RewriteSelectQuery(query string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("unable to get column names from where clause %v", err)
 		}
-		if colName == "shardid" {
+		if colName == colNameToRemove {
 			root.Stmt.GetSelectStmt().WhereClause = nil
 		}
 	} else {
 		slog.Debug("RewriteQuery", "unhandled case", whereClause)
-		return query, fmt.Errorf("unhandled case")
+		return "", fmt.Errorf("unhandled case")
 	}
 
-	modifiedQuery, err := pg_query.Deparse(result)
+	modifiedQuery, err := pg_query.Deparse(node)
 	if err != nil {
 		return "", fmt.Errorf("error deparsing query - %v", err)
 	}

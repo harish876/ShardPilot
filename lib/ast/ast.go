@@ -37,7 +37,9 @@ func GetAllColumns(node *pg_query.Node, acc map[string]int32) {
 		if value.GetIval() != nil {
 			acc[colName] = value.GetIval().Ival
 		} else if value.GetSval() != nil {
-			slog.Info("getAllColumns", "invalid shardid", value)
+			//shard key can only be a int for now
+			//change this once everything else is final
+			slog.Debug("GetAllColumns", "invalid shard key value", value)
 		}
 	} else if IsBoolExpr(node) {
 		parent := node.GetBoolExpr()
@@ -62,4 +64,8 @@ func GetQueryType(node *pg_query.Node) (string, error) {
 	} else {
 		return "", fmt.Errorf("unknown query type %v", node)
 	}
+}
+
+func GetTableNameFromSelect(node *pg_query.Node) (string, error) {
+	return node.String(), nil
 }

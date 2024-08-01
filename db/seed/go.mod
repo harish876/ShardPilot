@@ -1,4 +1,4 @@
-module github.com/harish876/ShardPilot/db
+module github.com/harish876/ShardPilot/db/seed
 
 go 1.22.4
 

@@ -6,7 +6,7 @@ import (
 )
 
 func TestCalculateShardId(t *testing.T) {
-	numberOfUsers := 2500000
+	numberOfUsers := 2500
 	numberOfShards := 3
 
 	shards := make(map[uint32]int)

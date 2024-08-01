@@ -13,11 +13,11 @@ func TestGetShardID1(t *testing.T) {
 	if err != nil {
 		t.Fatal("error building AST", err)
 	}
-	node := root.Stmts[0].Stmt
-	lp := NewLogicalPlanParams(node)
+	lp, err := NewLogicalPlanParams(root)
+	assert.NoError(t, err)
 	lp.
 		GetQueryType().
-		GetShardID()
+		GetShardId()
 
 	assert.NoError(t, lp.err, "Error creating query plan")
 	assert.Equal(t, lp.shardId, uint32(1))
@@ -30,11 +30,11 @@ func TestGetShardID2(t *testing.T) {
 	if err != nil {
 		t.Fatal("error building AST", err)
 	}
-	node := root.Stmts[0].Stmt
-	lp := NewLogicalPlanParams(node)
+	lp, err := NewLogicalPlanParams(root)
+	assert.NoError(t, err)
 	lp.
 		GetQueryType().
-		GetShardID()
+		GetShardId()
 
 	assert.NoError(t, lp.err, "Error creating query plan")
 	assert.Equal(t, lp.shardId, uint32(83310))
@@ -48,11 +48,11 @@ func TestGetShardID3(t *testing.T) {
 		t.Fatal("error building AST", err)
 	}
 
-	node := root.Stmts[0].Stmt
-	lp := NewLogicalPlanParams(node)
+	lp, err := NewLogicalPlanParams(root)
+	assert.NoError(t, err)
 	lp.
 		GetQueryType().
-		GetShardID()
+		GetShardId()
 
 	assert.Equal(t, lp.shardId, uint32(0))
 	assert.Equal(t, lp.queryType, "SELECT")
@@ -64,11 +64,11 @@ func TestGetShardID4(t *testing.T) {
 	if err != nil {
 		t.Fatal("error building AST", err)
 	}
-	node := root.Stmts[0].Stmt
-	lp := NewLogicalPlanParams(node)
+	lp, err := NewLogicalPlanParams(root)
+	assert.NoError(t, err)
 	lp.
 		GetQueryType().
-		GetShardID()
+		GetShardId()
 
 	assert.Equal(t, lp.shardId, uint32(1))
 	assert.Equal(t, lp.queryType, "SELECT")
@@ -80,8 +80,8 @@ func TestGetQueryType(t *testing.T) {
 	if err != nil {
 		t.Fatal("error building AST", err)
 	}
-	node := root.Stmts[0].Stmt
-	lp := NewLogicalPlanParams(node)
+	lp, err := NewLogicalPlanParams(root)
+	assert.NoError(t, err)
 	lp.GetQueryType()
 	assert.NoError(t, lp.err, "Error getting query type from query%v", lp.err)
 }

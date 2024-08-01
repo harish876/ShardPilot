@@ -42,17 +42,7 @@ services:
       - postgres_net
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-  
-  #seeder:
-  #   build:
-  #    context: .
-  #  depends_on:
-  #    - postgres1
-  #    - postgres2
-  #    - postgres3
-  #  networks:
-  #    - postgres_netv
-
+   
 networks:
   postgres_net:
     driver: bridge

@@ -12,6 +12,8 @@ import (
 	"golang.org/x/exp/rand"
 )
 
+var dbMap map[int]*sql.DB
+
 const (
 	user     = "shardPilot"
 	password = "shardPilot@123"
@@ -29,11 +31,11 @@ const (
 	port3   = 5433
 
 	NUMBER_OF_SHARDS = 3
-	NUMBER_OF_USERS  = 25
+	NUMBER_OF_USERS  = 2500
 )
 
-func getShard(userID int) string {
-	shardId, _ := hash.CalculateShardId(hash.IntToBytes(userID), NUMBER_OF_SHARDS)
+// todo move to config file
+func getShard(shardId int) string {
 	switch shardId {
 	case 1:
 		return fmt.Sprintf(
@@ -68,23 +70,39 @@ func getShard(userID int) string {
 
 func init() {
 	rand.Seed(uint64(time.Now().UnixNano()))
-}
+	dbMap = make(map[int]*sql.DB)
 
-func main() {
-	for userId := 1; userId <= NUMBER_OF_USERS; userId++ {
-		connStr := getShard(userId)
+	for i := 1; i <= 3; i++ {
+		connStr := getShard(i)
 		db, err := sql.Open("postgres", connStr)
 		if err != nil {
 			log.Fatalf("Error connecting to database: %v", err)
 		}
-		defer db.Close()
+
+		db.SetMaxOpenConns(10)                  // Max open connections to the database
+		db.SetMaxIdleConns(5)                   // Max idle connections in the pool
+		db.SetConnMaxIdleTime(30 * time.Second) // Max time a connection can remain idle
+		db.SetConnMaxLifetime(1 * time.Hour)    // Max lifetime of a connection
+
+		dbMap[i] = db
+	}
+}
+
+func main() {
+	for userId := 1; userId <= NUMBER_OF_USERS; userId++ {
+		shardId, _ := hash.CalculateShardId(hash.IntToBytes(userId), NUMBER_OF_SHARDS)
+		shardDB, ok := dbMap[int(shardId)]
+		if !ok {
+			log.Fatalf("Error connecting to database")
+		}
+		defer shardDB.Close()
 
 		name := GenerateRandomName()
 		phoneNumber := fmt.Sprintf("+%d-%010d", rand.Intn(100), rand.Int63n(10000000000))
 		emailAddr := strings.ToLower(strings.ReplaceAll(name, " ", "_"))
 		email := fmt.Sprintf("%s@example.com", emailAddr)
 
-		_, err = db.Exec(
+		_, err := shardDB.Exec(
 			"INSERT INTO users (user_id, name, phone_number, email) VALUES ($1, $2, $3, $4)",
 			userId,
 			name,
