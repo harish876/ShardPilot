@@ -17,15 +17,15 @@ type DispatchRequest struct {
 
 type DispatchResponse struct {
 	Message string `json:"message"`
-	Data    []User `json:"data,omitempty"`
 	Error   string `json:"error"`
+	Data    []User `json:"data,omitempty"`
 }
 
 type User struct {
-	UserID      int
 	Name        string
 	PhoneNumber string
 	Email       string
+	UserID      int
 }
 
 func GetDispatchHandler(c echo.Context) error {
@@ -48,7 +48,7 @@ func GetDispatchHandler(c echo.Context) error {
 		GetQueryType().
 		GetShardId()
 
-	modifiedQuery, err := physicalplanner.RewriteSelectQuery(node, "shardid")
+	modifiedQuery, err := physicalplanner.RemoveNodeFromSelectQuery(node, "shardkey")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, DispatchResponse{Error: err.Error()})
 	}

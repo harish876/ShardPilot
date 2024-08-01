@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetShardID1(t *testing.T) {
-	input := `select * from users where shardId =1`
+	input := `select * from users where shardKey = 'user_id' and user_id = 123`
 	root, err := pg_query.Parse(input)
 	if err != nil {
 		t.Fatal("error building AST", err)
@@ -20,12 +20,12 @@ func TestGetShardID1(t *testing.T) {
 		GetShardId()
 
 	assert.NoError(t, lp.err, "Error creating query plan")
-	assert.Equal(t, lp.shardId, uint32(1))
-	assert.Equal(t, lp.queryType, "SELECT")
+	assert.Equal(t, lp.ShardId, uint32(123))
+	assert.Equal(t, lp.QueryType, "SELECT")
 }
 
 func TestGetShardID2(t *testing.T) {
-	input := `select * from users where shardId = 83310 and userId = 123`
+	input := `select * from users where shardKey = 'user_id' and user_id = 123`
 	root, err := pg_query.Parse(input)
 	if err != nil {
 		t.Fatal("error building AST", err)
@@ -37,8 +37,8 @@ func TestGetShardID2(t *testing.T) {
 		GetShardId()
 
 	assert.NoError(t, lp.err, "Error creating query plan")
-	assert.Equal(t, lp.shardId, uint32(83310))
-	assert.Equal(t, lp.queryType, "SELECT")
+	assert.Equal(t, lp.ShardId, uint32(123))
+	assert.Equal(t, lp.QueryType, "SELECT")
 }
 
 func TestGetShardID3(t *testing.T) {
@@ -54,12 +54,12 @@ func TestGetShardID3(t *testing.T) {
 		GetQueryType().
 		GetShardId()
 
-	assert.Equal(t, lp.shardId, uint32(0))
-	assert.Equal(t, lp.queryType, "SELECT")
+	assert.Equal(t, lp.ShardId, uint32(0))
+	assert.Equal(t, lp.QueryType, "SELECT")
 }
 
 func TestGetShardID4(t *testing.T) {
-	input := `select * from users where shardId=1 and (userId=3 or colX = Z)`
+	input := `select * from users where shardKey = 'user_id' and colX = Z`
 	root, err := pg_query.Parse(input)
 	if err != nil {
 		t.Fatal("error building AST", err)
@@ -69,9 +69,8 @@ func TestGetShardID4(t *testing.T) {
 	lp.
 		GetQueryType().
 		GetShardId()
-
-	assert.Equal(t, lp.shardId, uint32(1))
-	assert.Equal(t, lp.queryType, "SELECT")
+	assert.Equal(t, lp.ShardId, uint32(0))
+	assert.Equal(t, lp.QueryType, "SELECT")
 }
 
 func TestGetQueryType(t *testing.T) {

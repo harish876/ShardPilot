@@ -27,7 +27,7 @@ func GetColumnNameFromLexprNode(node *pg_query.A_Expr) (string, error) {
 	}
 }
 
-func GetAllColumns(node *pg_query.Node, acc map[string]int32) {
+func GetAllColumns(node *pg_query.Node, acc map[string]interface{}) {
 	if node == nil {
 		return
 	}
@@ -37,9 +37,7 @@ func GetAllColumns(node *pg_query.Node, acc map[string]int32) {
 		if value.GetIval() != nil {
 			acc[colName] = value.GetIval().Ival
 		} else if value.GetSval() != nil {
-			//shard key can only be a int for now
-			//change this once everything else is final
-			slog.Debug("GetAllColumns", "invalid shard key value", value)
+			acc[colName] = value.GetSval().Sval
 		}
 	} else if IsBoolExpr(node) {
 		parent := node.GetBoolExpr()

@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/harish876/ShardPilot/config"
+	"github.com/harish876/ShardPilot/app/config"
+	"github.com/harish876/ShardPilot/app/routes"
 	"github.com/harish876/ShardPilot/db"
-	"github.com/harish876/ShardPilot/routes"
 	"github.com/labstack/echo/v4"
 )
 

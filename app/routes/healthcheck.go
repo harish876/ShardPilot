@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/harish876/ShardPilot/handlers"
+	"github.com/harish876/ShardPilot/app/handlers"
 	"github.com/labstack/echo/v4"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/harish876/ShardPilot/config"
+	"github.com/harish876/ShardPilot/app/config"
 	"github.com/labstack/echo/v4"
 )
 
