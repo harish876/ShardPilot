@@ -10,17 +10,15 @@ import (
 )
 
 // TODO: improve code structure
-func RewriteSelectQuery(node *pg_query.ParseResult, colNameToRemove string) (string, error) {
+func RemoveNodeFromSelectQuery(node *pg_query.ParseResult, colNameToRemove string) (string, error) {
 	if len(node.Stmts) == 0 {
 		return "", fmt.Errorf("no statements in the query - %s", node.String())
 	}
-
 	root := node.Stmts[0]
 	whereClause := root.Stmt.GetSelectStmt().WhereClause
-
 	if ast.IsBoolExpr(whereClause) {
 		slog.Debug("RewriteQuery", "Original Where Clause", whereClause.String())
-		modifiedWhereClause := removeShardId(whereClause, "shardid")
+		modifiedWhereClause := removeShardId(whereClause, colNameToRemove)
 		slog.Debug("Rewrite Query", "Modified Where Clause", modifiedWhereClause.String())
 		root.Stmt.GetSelectStmt().WhereClause = modifiedWhereClause
 
