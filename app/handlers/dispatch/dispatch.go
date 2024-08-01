@@ -48,7 +48,7 @@ func GetDispatchHandler(c echo.Context) error {
 		GetQueryType().
 		GetShardId()
 
-	modifiedQuery, err := physicalplanner.RemoveNodeFromSelectQuery(node, "shardkey")
+	modifiedQuery, err := physicalplanner.RemoveNodeFromSelectQuery(node, "shardid")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, DispatchResponse{Error: err.Error()})
 	}

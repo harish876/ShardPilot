@@ -14,11 +14,13 @@ func RemoveNodeFromSelectQuery(node *pg_query.ParseResult, colNameToRemove strin
 	if len(node.Stmts) == 0 {
 		return "", fmt.Errorf("no statements in the query - %s", node.String())
 	}
+
 	root := node.Stmts[0]
 	whereClause := root.Stmt.GetSelectStmt().WhereClause
+
 	if ast.IsBoolExpr(whereClause) {
 		slog.Debug("RewriteQuery", "Original Where Clause", whereClause.String())
-		modifiedWhereClause := removeShardId(whereClause, colNameToRemove)
+		modifiedWhereClause := removeShardId(whereClause, "shardid")
 		slog.Debug("Rewrite Query", "Modified Where Clause", modifiedWhereClause.String())
 		root.Stmt.GetSelectStmt().WhereClause = modifiedWhereClause
 
