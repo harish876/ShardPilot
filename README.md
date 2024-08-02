@@ -2,7 +2,7 @@
 
 ## Overview
 
-**ShardPilot** is a query engine designed to route database queries to individual shards based on the approach detailed in [Figma's Database Scaling Blog](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/). This project provides a proof of concept for handling `SELECT` statements with Shard IDs and other query parameters.
+**ShardPilot** is a query engine designed to route database queries to individual shards based on the approach detailed in [Figma's Database Scaling Blog](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/). This project provides a proof of concept for handling `SELECT` statements with a Logical Shard ID and other query parameters—a very naive implementation using the OG Postgres query parser's bindings in Golang.
 
 ## Features
 
@@ -86,7 +86,7 @@ Follow these steps to get ShardPilot up and running:
 
 ## TODOs
 
-1. **Topology Management**: Implement and distinguish between logical shards and physical shards.
+1. **Topology Management**: Implement and distinguish between logical and physical shards.
 2. **Figma Implementation**: Deepen understanding and integration of Figma's approach.
 3. **gRPC Conversion**: Convert REST endpoints to gRPC for enhanced performance and scalability.
 4. **Physical Planner**: Develop a physical planner with configuration management from a static file.
