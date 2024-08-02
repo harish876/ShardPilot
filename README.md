@@ -10,6 +10,10 @@
 - **Query Transformation**: Converts SQL queries into an Abstract Syntax Tree (AST) and rewrites them to exclude Shard IDs.
 - **Database Interaction**: Executes transformed queries on the appropriate shard and returns results.
 
+
+## Current Functionality (WIP)
+![Query Engine Parsing - Logical Planner](/docs/query_engine_poc.png)
+
 ## Setup
 
 Follow these steps to get ShardPilot up and running:
