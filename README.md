@@ -12,7 +12,11 @@
 
 
 ## Current Functionality (WIP)
-![Query Engine Parsing - Logical Planner](/docs/query_engine_poc.png)
+<p>
+  <img src="/docs/query_engine_poc.png" alt="Query Engine POC" />
+  <br>
+  <small>My Naive Implementation of this idea from Figma's Blog</small>
+</p>
 
 ## Setup
 
